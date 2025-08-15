@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>จดหมายถึงคุณ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600;700&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg: #fff7fb;
+  --ink: #2b2b2b;
+  --primary: #ff9ac2;
+  --primary-2: #ffd1e5;
+  --accent: #9ec9ff;
+  --paper: #fffdf8;
+  --shadow: 0 10px 30px rgba(0,0,0,.08);
+  --radius: 22px;
+  --speed: .75s;
+}
+*{ box-sizing: border-box; }
+html,body{ height:100%; margin:0; }
+body{
+  background: radial-gradient(1200px 800px at 70% -10%, #ffe6f3 0%, #fff 40%), var(--bg);
+  color:var(--ink);
+  font-family: 'Noto Sans Thai', 'Nunito', sans-serif;
+  line-height:1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scene */
+.scene{
+  min-height:100dvh;
+  padding: clamp(16px, 3vw, 32px);
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  position:relative;
+}
+
+/* Card */
+.card{
+  width:min(520px, 94vw);
+  min-height:min(680px, 88vh);
+  background: linear-gradient(180deg, #fff, #fff9fd 60%);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  position:relative;
+  padding: clamp(18px, 3.2vw, 28px);
+  display:grid;
+  grid-template-rows:auto 1fr auto;
+  gap:16px;
+}
+
+/* Header */
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.brand{ font-weight:800; letter-spacing:.4px; color:#ff69a3; font-family: Nunito, sans-serif; }
+.hint{ font-size: .92rem; opacity:.7; }
+
+/* Floaters */
+.floaters{ position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+.floater{ position:absolute; opacity:.22; animation: rise linear infinite; font-size:clamp(16px, 4vw, 22px);}
+@keyframes rise{ from{ transform: translateY(20%) scale(.9);} to{ transform: translateY(-120%) scale(1.1);} }
+
+/* Envelope */
+.envelope-wrap{ display:grid; place-items:center; height:100%; }
+.envelope{
+  width:min(360px, 86%);
+  aspect-ratio: 4 / 3;
+  position:relative;
+  filter: drop-shadow(0 12px 24px rgba(0,0,0,.12));
+  cursor:pointer;
+  transition: transform .3s ease;
+}
+.envelope:hover{ transform: scale(1.03); }
+.envelope .body{ position:absolute; inset:0; background:linear-gradient(180deg, var(--primary-2), #ffeaf4); border-radius:14px; }
+.envelope .flap{ position:absolute; inset:0; clip-path: polygon(0 0, 100% 0, 50% 70%); background: linear-gradient(180deg, #ffc0da, var(--primary)); transform-origin: 50% 0%; border-top-left-radius:14px; border-top-right-radius:14px; transition: transform var(--speed) cubic-bezier(.2,.8,.2,1); }
+.envelope .seal{ position:absolute; left:50%; top:44%; translate:-50% -50%; width:70px; height:26px; background:#fff; border-radius: 999px; box-shadow:inset 0 0 0 3px #ffd6e8; display:grid; place-items:center; font-size:12px; color:#ff5c98; font-weight:700; }
+.envelope .letter{ position:absolute; left:7%; right:7%; bottom:8%; height:58%; background:var(--paper); border-radius:10px; box-shadow:0 10px 16px rgba(0,0,0,.08); transform: translateY(18%) scale(.98); transition: transform var(--speed), opacity var(--speed); display:grid; place-items:center; padding:14px; text-align:center; font-weight:600; color:#ff67a6; opacity:.95; }
+.envelope.open .flap{ transform: rotateX(160deg); }
+.envelope.open .letter{ transform: translateY(-18%) scale(1); }
+
+.tap-label{ margin-top:10px; font-size:.95rem; opacity:.7; }
+
+/* Letter Pages */
+.letter-page{
+  position:absolute; inset:0;
+  padding: clamp(18px, 4vw, 28px);
+  display:grid; grid-template-rows:auto 1fr auto;
+  gap:16px;
+  background:linear-gradient(180deg, #fffefb, #fffdf6);
+  border-radius: calc(var(--radius) - 6px);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.04);
+  transform: translateY(6%) scale(.98);
+  opacity:0; pointer-events:none;
+  transition: transform .5s ease, opacity .5s ease;
+}
+.letter-page.active{ transform: translateY(0) scale(1); opacity:1; pointer-events:auto; }
+
+.paper-top{ display:flex; align-items:center; gap:10px; }
+.paper-pin{ width:14px; height:14px; background:var(--accent); border-radius:999px; box-shadow:0 2px 0 rgba(0,0,0,.08); }
+.paper-title{ font-weight:700; color:#ff5c98; }
+.paper-content{ display:grid; place-items:center; text-align:center; padding: 10px; }
+.quote{ font-size: clamp(1.1rem, 4.6vw, 1.6rem); font-weight:600; }
+
+/* Buttons */
+.actions{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+.btn{
+  appearance:none; border:none;
+  background:var(--primary); color:white;
+  padding:16px 28px;
+  border-radius: 999px;
+  font-weight:700;
+  font-size:1rem;
+  letter-spacing:.2px;
+  cursor:pointer;
+  box-shadow: 0 8px 18px rgba(255, 105, 163, .35);
+  transition: transform .2s, box-shadow .2s, opacity .2s;
+  min-width:140px;
+}
+.btn.secondary{ background:#fff; color:#ff5c98; box-shadow: inset 0 0 0 2px #ffc0da; }
+.btn:hover{ transform: translateY(-1px) scale(1.02); }
+.btn:active{ transform: translateY(1px) scale(.98); }
+
+.footer{ display:flex; justify-content:center; font-size:.85rem; opacity:.6; }
+
+/* Mobile */
+@media (max-width: 480px) {
+  .btn { padding: 18px 30px; font-size: 1rem; }
+}
+</style>
+</head>
+<body>
+<div class="scene">
+  <div class="floaters" aria-hidden="true" id="floaters"></div>
+  <div class="card">
+    <header class="header">
+      <div class="brand">✨ Letter</div>
+      <div class="hint">แตะที่ซองจดหมาย</div>
+    </header>
+
+    <!-- Envelope -->
+    <section class="envelope-wrap" id="envelopeStage">
+      <div class="envelope" id="envelope" tabindex="0">
+        <div class="body"></div>
+        <div class="flap"></div>
+        <div class="letter">เปิดดูข้อความ</div>
+        <div class="seal">สำหรับคุณ</div>
+      </div>
+      <div class="tap-label">แตะเพื่อเปิดซอง</div>
+    </section>
+
+    <!-- Page 1 -->
+    <section class="letter-page" id="page1">
+      <div class="paper-top"><span class="paper-pin"></span><span class="paper-title">หน้าที่ 1</span></div>
+      <div class="paper-content"><p class="quote">“ผมอยากกลับไปคุยกับคุณอีกครั้งได้มั้ยครับ”</p></div>
+      <div class="actions"><button class="btn" id="toPage2">อ่านต่อ</button></div>
+    </section>
+
+    <!-- Page 2 -->
+    <section class="letter-page" id="page2">
+      <div class="paper-top"><span class="paper-pin"></span><span class="paper-title">หน้าที่ 2</span></div>
+      <div class="paper-content"><p class="quote">“อยากรู้ยังพอกลับไปได้มั้ยครับ ตอนนี้คืออยากถามหลายเรื่องมาก”</p></div>
+      <div class="actions">
+        <button class="btn" id="toPage3">อ่านต่อ</button>
+        <button class="btn secondary" id="backTo1">ย้อนกลับ</button>
+      </div>
+    </section>
+
+    <!-- Page 3 -->
+    <section class="letter-page" id="page3">
+      <div class="paper-top"><span class="paper-pin"></span><span class="paper-title">หน้าที่ 3</span></div>
+      <div class="paper-content"><p class="quote">“ทั้งสถานะของคุณตอนนี้ และก็คุณกลับไปหาแฟนคุณแล้วรึป่าว ผมน่าจะคิดมาก”</p></div>
+      
+      <div class="actions">
+        <button class="btn" id="backToEnvelope">กลับไปหน้าซองจดหมาย</button>
+        <button class="btn secondary" id="backTo2">ย้อนกลับ</button>
+      </div>
+    </section>
+
+    <footer class="footer">BY POP</footer>
+  </div>
+</div>
+
+<script>
+const envelope = document.getElementById('envelope');
+const envelopeStage = document.getElementById('envelopeStage');
+const p1 = document.getElementById('page1');
+const p2 = document.getElementById('page2');
+const p3 = document.getElementById('page3');
+
+const toPage2 = document.getElementById('toPage2');
+const toPage3 = document.getElementById('toPage3');
+const backTo1 = document.getElementById('backTo1');
+const backTo2 = document.getElementById('backTo2');
+const backToEnvelope = document.getElementById('backToEnvelope');
+
+const show = (el) => el.classList.add('active');
+const hide = (el) => el.classList.remove('active');
+
+// เปิดซอง
+function openEnvelope(){
+  envelope.classList.add('open');
+  setTimeout(()=>{ envelopeStage.style.display = 'none'; show(p1); }, 630);
+}
+
+// ปุ่มสลับหน้า
+toPage2.addEventListener('click', ()=>{ hide(p1); show(p2); });
+toPage3.addEventListener('click', ()=>{ hide(p2); show(p3); });
+backTo1.addEventListener('click', ()=>{ hide(p2); show(p1); });
+backTo2.addEventListener('click', ()=>{ hide(p3); show(p2); });
+
+// ปุ่มย้อนกลับหน้าสุดท้าย -> ซองจดหมาย
+backToEnvelope.addEventListener('click', ()=>{
+  hide(p3);
+  envelopeStage.style.display = 'grid';
+  envelope.classList.remove('open');
+});
+
+// เปิดซองเมื่อคลิก
+envelope.addEventListener('click', openEnvelope);
+envelope.addEventListener('keydown', (e)=>{
+  if(e.key==='Enter' || e.key===' '){ e.preventDefault(); openEnvelope(); }
+});
+
+// สร้างหัวใจลอยเบา ๆ
+const floaters = document.getElementById('floaters');
+const ICONS = ['✿','❀','★','♥','✦','✧'];
+function spawnFloater(){
+  const el = document.createElement('div');
+  el.className = 'floater';
+  el.textContent = ICONS[Math.floor(Math.random()*ICONS.length)];
+  el.style.left = Math.random()*100+'%';
+  el.style.bottom = '-10%';
+  el.style.animationDuration = (10 + Math.random()*12)+'s';
+  floaters.appendChild(el);
+  setTimeout(()=> el.remove(), 20000);
+}
+setInterval(spawnFloater, 1800);
+for(let i=0;i<6;i++) setTimeout(spawnFloater, i*500);
+</script>
+</body>
+</html>
